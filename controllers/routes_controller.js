@@ -3,6 +3,19 @@ var router = express.Router()
 const mongoose = require("mongoose")
 const Routes = mongoose.model("Routes")
 
+const { createClient } = require("redis");
+
+// Connecting to redis
+const client = createClient({
+    host: "127.0.0.1",
+    port: 6379,
+});
+
+async function main() {
+    await client.connect();
+}
+main();
+
 router.get("/", (req,res) => {
     res.render("router/crud", {
         viewTitle: "Insert Route"
@@ -46,9 +59,20 @@ function updateRecord(req, res){
     });
 }
 
-router.get("/list", (req, res) => {
-    Routes.find((err,docs) =>{
+router.get("/list", async (req, res) => {
+    // Obtienes las routes del cache
+    const reply = await client.get("routes");
+    // Muestra los routes del cache
+    if (reply) return res.render("router/list", { list: JSON.parse(reply) })
+
+    Routes.find( async (err,docs) =>{
         if (!err) {
+            // Guardamos los datos en cache
+            const saveResult = await client.set(
+                "routes",
+                JSON.stringify(docs)
+            );
+
             res.render("router/list", {
                 list: docs
             })
@@ -59,6 +83,7 @@ router.get("/list", (req, res) => {
 });
 
 router.get("/:id", (req,res) => {
+
     Routes.findById(req.params.id, (err, doc) => {
         if (!err) {
             res.render("router/crud", {

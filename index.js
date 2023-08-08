@@ -8,10 +8,13 @@ const bodyparser = require('body-parser')
 const { engine } = require('express-handlebars');
 const routes_controller = require('./controllers/routes_controller')
 
+const responseTime = require("response-time");
+
 var app = express();
 
 app.use(bodyparser.urlencoded({extended: false}))
 app.use(bodyparser.json())
+app.use(responseTime())
 
 app.get('/', (req, res) => {
     res.send(`

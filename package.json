@@ -16,6 +16,8 @@
     "express-handlebars": "^6.0.2",
     "handlebars": "^4.7.7",
     "mongoose": "^6.11.4",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "redis": "^4.6.7",
+    "response-time": "^2.3.2"
   }
 }
