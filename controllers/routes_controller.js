@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const Routes = mongoose.model("Routes")
 
 const { createClient } = require("redis");
+// let contadorConsultaBDconRedis = 0;
 
 // Connecting to redis
 const client = createClient({
@@ -66,11 +67,14 @@ router.get("/list", async (req, res) => {
     if (reply) return res.render("router/list", { list: JSON.parse(reply) })
 
     Routes.find( async (err,docs) =>{
+        // contadorConsultaBDconRedis = contadorConsultaBDconRedis + 1;
+        console.log(contadorConsultaBDconRedis);
         if (!err) {
             // Guardamos los datos en cache
             const saveResult = await client.set(
                 "routes",
-                JSON.stringify(docs)
+                JSON.stringify(docs),
+                { EX: 10,}
             );
 
             res.render("router/list", {
